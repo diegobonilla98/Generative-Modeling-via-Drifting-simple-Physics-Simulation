@@ -1,5 +1,7 @@
 # Drift Model Simulator
 
+## [▶ Live Demo](https://diegobonilla98.github.io/Generative-Modeling-via-Drifting-simple-Physics-Simulation/)
+
 An interactive 2D physics simulation that visualizes the drifting field from **Generative Modeling via Drifting** (Deng et al., 2026). Black particles (generated samples) drift toward blue particles (positive/data samples) and away from each other (negative samples), implementing Algorithm 2 from the paper in real time.
 
 ⚠️ **Disclaimer:** This app is mostly vibecoded. Security risks are none, but this is an honest disclaimer 😘.
