@@ -17,30 +17,42 @@ The paper proposes *Drifting Models*, a generative paradigm where the pushforwar
 
 ## Mathematical Background
 
-### Drifting Field
+Imagine you are training a one-shot generator: sample noise once, output once. The challenge is not only mapping noise to samples, but finding a stable learning signal that reshapes the full generated cloud to match data, without mode collapse.
 
-The field is anti-symmetric: **V**<sub>p,q</sub>(**x**) = −**V**<sub>q,p</sub>(**x**). At equilibrium, when the distributions match, **V** = 0.
+Drifting Models answer this with a physical view. At each step, think of two point clouds in a semantic feature space: positive points **y+** from real data and negative points **y-** from the current generator. For each generated sample **x**, we compute a drift vector **V(x)**: the local push that would make generated samples look more like data.
 
-### Algorithm 2 (Implemented Here)
+This drift has two pieces:
 
-1. **Logits**: For each generated sample **x**<sub>i</sub>, compute pairwise distances to positive samples **y**<sub>pos</sub> and negative samples **y**<sub>neg</sub> (= **x**). Logits = −‖**x** − **y**‖ / T.
+- attraction toward nearby real samples (**Vp+**)
+- repulsion away from nearby generated samples (**Vq-**)
 
-2. **Normalization**: Row-softmax and column-softmax on the concatenated logit matrix [**y**<sub>pos</sub>, **y**<sub>neg</sub>].
+The net field is:
 
-3. **Geometric mean**: A = √(A<sub>row</sub> × A<sub>col</sub>).
+- **V = Vp+ - Vq-**
 
-4. **Drift**: **V** = (W<sub>pos</sub> @ **y**<sub>pos</sub>) − (W<sub>neg</sub> @ **y**<sub>neg</sub>).
+If a region has more data than generated samples, attraction dominates. If a region is overcrowded by generated samples, repulsion dominates. At equilibrium, these forces cancel and **V ~ 0**.
 
-### Intuition
+![Illustration of the drifting field](assets/Illustration%20of%20the%20drifting%20field.png)
 
-- **Blue particles** = positive samples (data distribution *p*)
-- **Black particles** = generated samples (distribution *q*), also used as negatives
-- Each black particle is attracted by nearby blue particles and repelled by nearby black particles
-- Lower temperature T → more local interactions; higher T → more global
+In the simulator, the paper-aligned Algorithm 2 is implemented as:
+
+1. Compute logits from distances for positives and negatives: `-||x-y|| / T`.
+2. Concatenate `[y_pos, y_neg]`.
+3. Apply row-softmax and column-softmax.
+4. Combine them with geometric mean weights.
+5. Build positive and negative weighted sums.
+6. Subtract to get drift:
+   `V = (W_pos @ y_pos) - (W_neg @ y_neg)` with `y_neg = x`.
+
+![Computation of the drifting field V](assets/Computation%20of%20the%20drifting%20field%20V.png)
+
+The training trick from the paper is simple and elegant: compute drift from current batches, freeze it, and update the network to produce outputs slightly moved along that drift. Repeating this across SGD steps gradually reshapes the whole generated distribution. That is why inference remains one-step: all iterative movement happens during training, not at sampling time.
 
 ## Demo Videos
 
+https://github.com/user-attachments/assets/25377e63-c391-4a2a-9c65-c266d09e5c41
 
+https://github.com/user-attachments/assets/75b0a636-77dc-46e2-8881-24ab730975b3
 
 ## Running the Simulator
 
@@ -74,6 +86,8 @@ Open the URL shown in the terminal (typically `http://localhost:5173`).
 ```
 DriftModelSim/
 ├── assets/
+│   ├── Illustration of the drifting field.png
+│   ├── Computation of the drifting field V.png
 │   ├── video_1_blobs.mp4
 │   └── video_2_face.mp4
 ├── 2_d_drifting_particles_simulator.tsx   # Main simulator (Algorithm 2 + UI)
