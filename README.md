@@ -40,9 +40,7 @@ The field is anti-symmetric: **V**<sub>p,q</sub>(**x**) = −**V**<sub>q,p</sub>
 
 ## Demo Videos
 
-<video src="assets/video_1_blobs.mp4" controls width="640"></video>
 
-<video src="assets/video_2_face.mp4" controls width="640"></video>
 
 ## Running the Simulator
 
