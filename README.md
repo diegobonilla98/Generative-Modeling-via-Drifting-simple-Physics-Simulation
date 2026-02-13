@@ -2,6 +2,10 @@
 
 An interactive 2D physics simulation that visualizes the drifting field from **Generative Modeling via Drifting** (Deng et al., 2026). Black particles (generated samples) drift toward blue particles (positive/data samples) and away from each other (negative samples), implementing Algorithm 2 from the paper in real time.
 
+<div style="background-color: #fff3cd; border: 1px solid #ffc107; border-radius: 4px; padding: 8px 12px; margin: 16px 0; font-size: 14px;">
+⚠️ <strong>Disclaimer:</strong> This app is mostly vibecoded. Security risks are none, but this is an honest disclaimer 😘.
+</div>
+
 ## Paper & Inspiration
 
 This simulator is inspired by:
